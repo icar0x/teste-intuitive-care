@@ -1,172 +1,95 @@
-📌 Contexto
+Teste Técnico – Pipeline de Dados (ANS)
 
-Este projeto foi desenvolvido como parte de um teste técnico para vaga de estágio, com o objetivo de avaliar a capacidade de trabalhar com dados reais, tomar decisões técnicas fundamentadas e documentar o processo.
+O foco do projeto foi resolver o problema de forma simples, organizada e bem documentada, priorizando clareza e decisões técnicas conscientes, em vez de soluções complexas ou artificiais.
 
-Os dados utilizados são públicos e disponibilizados pela ANS (Agência Nacional de Saúde Suplementar), o que implica lidar com arquivos inconsistentes, diferentes formatos e ausência de padronização.
-
-🎯 Objetivo
-
-O objetivo do projeto é:
-
-Coletar dados de demonstrações contábeis da ANS
-
-Identificar e consolidar despesas relacionadas a eventos/sinistros
-
-Tratar e validar inconsistências nos dados
-
+🎯 O que este projeto faz
+De forma resumida, o projeto:
+Processa dados contábeis trimestrais da ANS
+Filtra despesas relacionadas a eventos e sinistros
+Consolida dados de múltiplos trimestres
+Trata inconsistências comuns em dados reais
 Enriquecer os dados com informações cadastrais das operadoras
+Gera análises agregadas
+Modela os dados e consultas em SQL para análise posterior
 
-Gerar análises agregadas sobre as despesas das operadoras de planos de saúde
+🛠 Tecnologias utilizadas
 
-🗂 Estrutura do Projeto
+Python 
+Linguagem principal utilizada para todo o pipeline de dados.
+Pandas
+Biblioteca usada para leitura, tratamento, validação e agregação dos dados em CSV.
+SQL
+Utilizado para modelagem dos dados e criação de consultas analíticas.
+
+🗂 Organização do repositório
 teste-intuitive-care/
 │
 ├── data/
-│   ├── raw/                    # Dados brutos (ZIPs e CSVs originais)
-│   │   ├── extracted/          # Arquivos extraídos dos ZIPs
-│   │   └── relatorio_cadop.csv # Cadastro das operadoras
+│   ├── raw/                  # Dados brutos
+│   │   ├── extracted/        # CSVs extraídos dos arquivos ZIP
+│   │   └── relatorio_cadop.csv
 │   │
-│   └── processed/              # Dados processados
+│   └── processed/            # Dados tratados e consolidados
 │       ├── consolidado_despesas.csv
 │       ├── consolidado_despesas_validado.csv
 │       ├── despesas_enriquecidas.csv
 │       └── despesas_agregadas.csv
 │
-├── src/                        # Scripts Python
+├── src/                      # Scripts do pipeline
 │   ├── extract_zips.py
-│   ├── inspect_csvs.py
 │   ├── consolidar_despesas.py
 │   ├── validar_dados.py
 │   ├── enriquecer_dados.py
 │   └── agregar_despesas_finais.py
 │
+├── sql/                      # Modelagem e consultas SQL
+│   ├── schema.sql
+│   ├── load.sql
+│   └── queries.sql
+│
 └── README.md
 
-🔄 Fluxo de Processamento dos Dados
+🔄 Como o pipeline funciona
 
-O pipeline de dados segue o seguinte fluxo:
+O fluxo de dados segue a seguinte lógica:
+Extração dos arquivos ZIP disponibilizados pela ANS
+Leitura dos arquivos CSV, considerando separador e encoding
+Filtragem das despesas relevantes
+Consolidação dos dados dos diferentes trimestres
+Validação e limpeza dos dados
+Enriquecimento com o cadastro das operadoras
+Agregação final para análise
+Esse fluxo foi dividido em scripts separados para facilitar leitura, manutenção e entendimento.
 
-Arquivos ZIP da ANS
-   ↓
-Extração dos arquivos
-   ↓
-Leitura de CSVs com formatos inconsistentes
-   ↓
-Filtragem de despesas (eventos/sinistros)
-   ↓
-Consolidação por trimestre
-   ↓
-Validação dos dados
-   ↓
-Enriquecimento com cadastro das operadoras
-   ↓
-Agregação e análise final
+🧠 Principais decisões técnicas
 
-🧩 Etapas Desenvolvidas
-1️⃣ Extração dos Arquivos
+Uso do Python com Pandas
+Escolhido pela praticidade e clareza na manipulação de dados em CSV.
+Tratamento dos dados antes do SQL
+Optou-se por limpar, validar e consolidar os dados em Python, reduzindo a complexidade das consultas SQL.
+Uso do REG_ANS como identificador
+Os arquivos contábeis não possuem CNPJ ou Razão Social. O REG_ANS foi a única chave consistente para relacionar os dados financeiros com o cadastro das operadoras.
+LEFT JOIN no enriquecimento
+Garantiu que nenhuma despesa fosse descartada por ausência de cadastro.
+Priorização do escopo
+O foco foi o pipeline de dados e a análise. API e frontend não foram implementados para evitar uma solução superficial.
 
-Os arquivos ZIP referentes aos últimos trimestres foram extraídos automaticamente para garantir organização e reprodutibilidade do processo.
+🗄 SQL
+A etapa de SQL foi desenvolvida com foco em modelagem e análise, utilizando como base os arquivos CSV gerados pelo pipeline em Python.
+Foram definidas tabelas separando:
+Dados cadastrais das operadoras
+Dados financeiros consolidados
+As consultas SQL presentes no projeto permitem:
+Analisar o total de despesas por operadora
+Comparar despesas por UF
+Calcular médias e agregações
+O SQL foi escrito de forma genérica, podendo ser adaptado para diferentes bancos relacionais com ajustes mínimos.
 
-Decisão técnica:
-A extração automatizada reduz erros manuais e facilita a reexecução do pipeline.
+▶️ Como executar
+Instalar a dependência principal:
 
-2️⃣ Leitura e Inspeção dos CSVs
-
-Os arquivos extraídos apresentaram:
-
-Separador ;
-
-Encoding latin1
-
-Estrutura contábil não padronizada
-
-Foi adotada uma leitura flexível para evitar falhas de parsing.
-
-Trade-off:
-Priorizar robustez na leitura em vez de assumir um formato CSV padrão.
-
-3️⃣ Consolidação das Despesas
-
-Foram filtrados apenas os registros relacionados a despesas, eventos e sinistros, com base em palavras-chave na coluna de descrição contábil.
-
-Como os arquivos não possuem CNPJ ou Razão Social, foi utilizado o identificador REG_ANS como chave primária.
-
-Decisão técnica:
-O vínculo com CNPJ e Razão Social é realizado posteriormente por meio do cadastro oficial das operadoras.
-
-4️⃣ Validação dos Dados
-
-Foram aplicadas regras básicas de qualidade:
-
-Remoção de identificadores vazios
-
-Conversão de valores para tipo numérico
-
-Exclusão de valores negativos ou inválidos
-
-Validação do trimestre
-
-Trade-off:
-Optou-se por remover registros inválidos para garantir consistência das análises.
-
-5️⃣ Enriquecimento dos Dados
-
-Os dados consolidados foram enriquecidos com o arquivo relatorio_cadop.csv, adicionando:
-
-CNPJ
-
-Razão Social
-
-Modalidade
-
-UF
-
-Foi utilizado LEFT JOIN para evitar perda de registros financeiros.
-
-Decisão técnica:
-Registros sem correspondência no cadastro são mantidos, com campos nulos.
-
-6️⃣ Agregação Final
-
-Os dados enriquecidos foram agregados por:
-
-Razão Social
-
-UF
-
-Foram calculadas:
-
-Soma total das despesas
-
-Média trimestral
-
-Desvio padrão das despesas
-
-Os resultados foram ordenados do maior para o menor valor total.
-
-📊 Arquivos Gerados
-
-consolidado_despesas.csv – dados consolidados brutos
-
-consolidado_despesas_validado.csv – dados após validação
-
-despesas_enriquecidas.csv – dados com informações cadastrais
-
-despesas_agregadas.csv – resultado analítico final
-
-🧠 Considerações e Limitações
-
-Os dados públicos apresentam inconsistências naturais
-
-Nem todas as operadoras possuem correspondência no cadastro
-
-O projeto prioriza simplicidade, clareza e manutenibilidade (KISS)
-
-▶️ Como Executar o Projeto
-1️⃣ Instalar dependências
 pip install pandas
-
-2️⃣ Executar os scripts (ordem sugerida)
+Executar os scripts em ordem:
 python src/extract_zips.py
 python src/consolidar_despesas.py
 python src/validar_dados.py
