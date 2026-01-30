@@ -84,14 +84,3 @@ Analisar o total de despesas por operadora
 Comparar despesas por UF
 Calcular médias e agregações
 O SQL foi escrito de forma genérica, podendo ser adaptado para diferentes bancos relacionais com ajustes mínimos.
-
-▶️ Como executar
-Instalar a dependência principal:
-
-pip install pandas
-Executar os scripts em ordem:
-python src/extract_zips.py
-python src/consolidar_despesas.py
-python src/validar_dados.py
-python src/enriquecer_dados.py
-python src/agregar_despesas_finais.py
